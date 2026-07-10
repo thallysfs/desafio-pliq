@@ -1,9 +1,7 @@
 namespace PliqCx.Api.Features.Analytics;
 
-/// <summary>Contagem + percentual de uma classe NPS (promotor/neutro/detrator).</summary>
 public sealed record ClassBucket(long Count, decimal Pct);
 
-/// <summary>Resposta de GET /api/analytics/summary (shape fixo do contrato).</summary>
 public sealed record SummaryResponse(
     int NpsScore,
     long NpsResponses,
@@ -13,7 +11,6 @@ public sealed record SummaryResponse(
     long ResponsesCount,
     decimal? CsatAvg);
 
-/// <summary>Linha achatada vinda do SQL agregado; mapeada para SummaryResponse.</summary>
 internal sealed record SummaryRow(
     long NpsResponses,
     long Promoters,

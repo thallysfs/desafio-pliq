@@ -2,7 +2,6 @@ using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace PliqCx.Api.Features.Analytics;
 
-/// <summary>Registro do módulo de Analytics: DI + endpoint de resumo.</summary>
 public static class AnalyticsModule
 {
     public static IServiceCollection AddAnalyticsModule(this IServiceCollection services)

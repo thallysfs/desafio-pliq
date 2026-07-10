@@ -30,3 +30,4 @@
 /home/lostboy/Programação/desafio-pliq/backend/PliqCx.Api/obj/Debug/net10.0/PliqCx.Api.pdb
 /home/lostboy/Programação/desafio-pliq/backend/PliqCx.Api/obj/Debug/net10.0/PliqCx.Api.genruntimeconfig.cache
 /home/lostboy/Programação/desafio-pliq/backend/PliqCx.Api/obj/Debug/net10.0/ref/PliqCx.Api.dll
+/home/lostboy/Programação/desafio-pliq/backend/PliqCx.Api/obj/Debug/net10.0/PliqCx.Api.sourcelink.json

@@ -5,7 +5,6 @@ using PliqCx.Api.Common;
 
 namespace PliqCx.Api.Features.Contacts;
 
-/// <summary>Registro do módulo de Contatos: DI + endpoints (endpoint fino, regra no repo).</summary>
 public static class ContactsModule
 {
     public static IServiceCollection AddContactsModule(this IServiceCollection services)
@@ -93,7 +92,6 @@ public static class ContactsModule
     private static async Task<Results<Ok<IReadOnlyList<ContactResponseItem>>, NotFound>> GetResponses(
         int id, IContactRepository repo, CancellationToken ct)
     {
-        // 404 quando o contato não existe/foi excluído (não só quando não há respostas).
         if (await repo.GetAsync(id, ct) is null)
             return TypedResults.NotFound();
 
@@ -101,7 +99,6 @@ public static class ContactsModule
         return TypedResults.Ok(responses);
     }
 
-    /// <summary>Validações do contrato: name obrigatório, email obrigatório e válido.</summary>
     private static string? Validate(ContactUpsertRequest req)
     {
         if (string.IsNullOrWhiteSpace(req.Name))
@@ -113,7 +110,6 @@ public static class ContactsModule
         return null;
     }
 
-    /// <summary>segment é opcional; texto em branco vira null.</summary>
     private static string? NormalizeSegment(string? segment)
         => string.IsNullOrWhiteSpace(segment) ? null : segment.Trim();
 }

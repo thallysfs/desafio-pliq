@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("PliqCx.Api")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+14543887f73c7d3b6db2fbf84ae52a61aeb67c93")]
 [assembly: System.Reflection.AssemblyProductAttribute("PliqCx.Api")]
 [assembly: System.Reflection.AssemblyTitleAttribute("PliqCx.Api")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

@@ -13,17 +13,10 @@ public interface IContactRepository
     Task<IReadOnlyList<ContactResponseItem>> GetResponsesAsync(int contactId, CancellationToken ct);
 }
 
-/// <summary>
-/// Acesso a dados de contatos com Dapper + SQL escrito à mão. Todas as leituras
-/// filtram deleted_at IS NULL (regra nº 1). Parâmetros sempre nomeados — nunca
-/// concatenação de entrada do usuário.
-/// </summary>
 public sealed class ContactRepository(NpgsqlDataSource dataSource) : IContactRepository
 {
     public async Task<ContactListResult> ListAsync(string? search, int page, int pageSize, CancellationToken ct)
     {
-        // Busca opcional por nome OU e-mail, case-insensitive/parcial (ILIKE + pg_trgm).
-        // O @search IS NULL evita aplicar o filtro quando não há termo.
         const string filter = """
             WHERE deleted_at IS NULL
               AND (@search IS NULL OR name ILIKE @pattern OR email ILIKE @pattern)
@@ -60,8 +53,6 @@ public sealed class ContactRepository(NpgsqlDataSource dataSource) : IContactRep
 
     public async Task<Contact> CreateAsync(string name, string email, string? segment, CancellationToken ct)
     {
-        // Unicidade de e-mail é garantida pelo índice único parcial no banco;
-        // a violação (23505) é traduzida em 409 no endpoint.
         await using var conn = await dataSource.OpenConnectionAsync(ct);
         return await conn.QuerySingleAsync<Contact>(new CommandDefinition("""
             INSERT INTO contacts (name, email, segment)
@@ -72,8 +63,6 @@ public sealed class ContactRepository(NpgsqlDataSource dataSource) : IContactRep
 
     public async Task<Contact?> UpdateAsync(int id, string name, string email, string? segment, CancellationToken ct)
     {
-        // O índice único parcial ignora o próprio registro (mesma linha), então
-        // reenviar o e-mail atual não gera 409 — só colisão com OUTRO ativo.
         await using var conn = await dataSource.OpenConnectionAsync(ct);
         return await conn.QuerySingleOrDefaultAsync<Contact>(new CommandDefinition("""
             UPDATE contacts
@@ -85,7 +74,6 @@ public sealed class ContactRepository(NpgsqlDataSource dataSource) : IContactRep
 
     public async Task<bool> SoftDeleteAsync(int id, CancellationToken ct)
     {
-        // Soft delete: marca deleted_at. Só afeta linha ainda ativa (idempotente p/ 404).
         await using var conn = await dataSource.OpenConnectionAsync(ct);
         var affected = await conn.ExecuteAsync(new CommandDefinition("""
             UPDATE contacts SET deleted_at = now()
@@ -102,7 +90,7 @@ public sealed class ContactRepository(NpgsqlDataSource dataSource) : IContactRep
                    r.survey_id,
                    s.name AS survey_name,
                    s.type AS survey_type,
-                   r.score::int AS score,   -- smallint -> int p/ casar o record (Dapper)
+                   r.score::int AS score,
                    r.comment,
                    r.channel,
                    r.responded_at

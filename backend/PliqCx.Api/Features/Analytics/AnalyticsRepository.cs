@@ -8,13 +8,6 @@ public interface IAnalyticsRepository
     Task<SummaryResponse> GetSummaryAsync(CancellationToken ct);
 }
 
-/// <summary>
-/// Resumo de satisfação: UMA consulta agregada em SQL (GROUP não é preciso —
-/// FILTER faz os recortes por classe/escala). Regras aplicadas no banco:
-/// deleted_at IS NULL, separação NPS×CSAT por surveys.type, classificação NPS por
-/// faixa de score, e arredondamento só no resultado final (npsScore da diferença
-/// das porcentagens cruas). NULLIF evita divisão por zero.
-/// </summary>
 public sealed class AnalyticsRepository(NpgsqlDataSource dataSource) : IAnalyticsRepository
 {
     private const string SummarySql = """
@@ -50,7 +43,6 @@ public sealed class AnalyticsRepository(NpgsqlDataSource dataSource) : IAnalytic
         var row = await conn.QuerySingleAsync<SummaryRow>(
             new CommandDefinition(SummarySql, cancellationToken: ct));
 
-        // Recorte sem respostas NPS vem zerado (nunca NaN/500), conforme contrato.
         return new SummaryResponse(
             NpsScore: (int)(row.NpsScore ?? 0),
             NpsResponses: row.NpsResponses,
