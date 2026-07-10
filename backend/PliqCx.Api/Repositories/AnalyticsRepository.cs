@@ -1,12 +1,8 @@
 using Dapper;
 using Npgsql;
+using PliqCx.Api.Entities;
 
-namespace PliqCx.Api.Features.Analytics;
-
-public interface IAnalyticsRepository
-{
-    Task<SummaryResponse> GetSummaryAsync(CancellationToken ct);
-}
+namespace PliqCx.Api.Repositories;
 
 public sealed class AnalyticsRepository(NpgsqlDataSource dataSource) : IAnalyticsRepository
 {
@@ -37,19 +33,10 @@ public sealed class AnalyticsRepository(NpgsqlDataSource dataSource) : IAnalytic
         FROM valid
         """;
 
-    public async Task<SummaryResponse> GetSummaryAsync(CancellationToken ct)
+    public async Task<SummaryRow> GetSummaryAsync(CancellationToken ct)
     {
         await using var conn = await dataSource.OpenConnectionAsync(ct);
-        var row = await conn.QuerySingleAsync<SummaryRow>(
+        return await conn.QuerySingleAsync<SummaryRow>(
             new CommandDefinition(SummarySql, cancellationToken: ct));
-
-        return new SummaryResponse(
-            NpsScore: (int)(row.NpsScore ?? 0),
-            NpsResponses: row.NpsResponses,
-            Promoters: new ClassBucket(row.Promoters, row.PromotersPct ?? 0m),
-            Neutrals: new ClassBucket(row.Neutrals, row.NeutralsPct ?? 0m),
-            Detractors: new ClassBucket(row.Detractors, row.DetractorsPct ?? 0m),
-            ResponsesCount: row.ResponsesCount,
-            CsatAvg: row.CsatAvg);
     }
 }

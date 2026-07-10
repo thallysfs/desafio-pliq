@@ -1,21 +1,14 @@
 using Dapper;
 using Npgsql;
+using PliqCx.Api.Common.Exceptions;
+using PliqCx.Api.Entities;
 
-namespace PliqCx.Api.Features.Contacts;
-
-public interface IContactRepository
-{
-    Task<ContactListResult> ListAsync(string? search, int page, int pageSize, CancellationToken ct);
-    Task<Contact?> GetAsync(int id, CancellationToken ct);
-    Task<Contact> CreateAsync(string name, string email, string? segment, CancellationToken ct);
-    Task<Contact?> UpdateAsync(int id, string name, string email, string? segment, CancellationToken ct);
-    Task<bool> SoftDeleteAsync(int id, CancellationToken ct);
-    Task<IReadOnlyList<ContactResponseItem>> GetResponsesAsync(int contactId, CancellationToken ct);
-}
+namespace PliqCx.Api.Repositories;
 
 public sealed class ContactRepository(NpgsqlDataSource dataSource) : IContactRepository
 {
-    public async Task<ContactListResult> ListAsync(string? search, int page, int pageSize, CancellationToken ct)
+    public async Task<(IReadOnlyList<Contact> Items, long Total)> ListAsync(
+        string? search, int page, int pageSize, CancellationToken ct)
     {
         const string filter = """
             WHERE deleted_at IS NULL
@@ -38,7 +31,7 @@ public sealed class ContactRepository(NpgsqlDataSource dataSource) : IContactRep
             LIMIT @limit OFFSET @offset
             """, args, cancellationToken: ct));
 
-        return new ContactListResult(items.AsList(), total, page, pageSize);
+        return (items.AsList(), total);
     }
 
     public async Task<Contact?> GetAsync(int id, CancellationToken ct)
@@ -53,23 +46,37 @@ public sealed class ContactRepository(NpgsqlDataSource dataSource) : IContactRep
 
     public async Task<Contact> CreateAsync(string name, string email, string? segment, CancellationToken ct)
     {
-        await using var conn = await dataSource.OpenConnectionAsync(ct);
-        return await conn.QuerySingleAsync<Contact>(new CommandDefinition("""
-            INSERT INTO contacts (name, email, segment)
-            VALUES (@name, @email, @segment)
-            RETURNING id, name, email, segment
-            """, new { name, email, segment }, cancellationToken: ct));
+        try
+        {
+            await using var conn = await dataSource.OpenConnectionAsync(ct);
+            return await conn.QuerySingleAsync<Contact>(new CommandDefinition("""
+                INSERT INTO contacts (name, email, segment)
+                VALUES (@name, @email, @segment)
+                RETURNING id, name, email, segment
+                """, new { name, email, segment }, cancellationToken: ct));
+        }
+        catch (PostgresException e) when (e.SqlState == PostgresErrorCodes.UniqueViolation)
+        {
+            throw new ConflictException("Já existe um contato com esse e-mail.");
+        }
     }
 
     public async Task<Contact?> UpdateAsync(int id, string name, string email, string? segment, CancellationToken ct)
     {
-        await using var conn = await dataSource.OpenConnectionAsync(ct);
-        return await conn.QuerySingleOrDefaultAsync<Contact>(new CommandDefinition("""
-            UPDATE contacts
-            SET name = @name, email = @email, segment = @segment
-            WHERE id = @id AND deleted_at IS NULL
-            RETURNING id, name, email, segment
-            """, new { id, name, email, segment }, cancellationToken: ct));
+        try
+        {
+            await using var conn = await dataSource.OpenConnectionAsync(ct);
+            return await conn.QuerySingleOrDefaultAsync<Contact>(new CommandDefinition("""
+                UPDATE contacts
+                SET name = @name, email = @email, segment = @segment
+                WHERE id = @id AND deleted_at IS NULL
+                RETURNING id, name, email, segment
+                """, new { id, name, email, segment }, cancellationToken: ct));
+        }
+        catch (PostgresException e) when (e.SqlState == PostgresErrorCodes.UniqueViolation)
+        {
+            throw new ConflictException("Já existe um contato com esse e-mail.");
+        }
     }
 
     public async Task<bool> SoftDeleteAsync(int id, CancellationToken ct)
@@ -82,10 +89,10 @@ public sealed class ContactRepository(NpgsqlDataSource dataSource) : IContactRep
         return affected > 0;
     }
 
-    public async Task<IReadOnlyList<ContactResponseItem>> GetResponsesAsync(int contactId, CancellationToken ct)
+    public async Task<IReadOnlyList<ContactResponse>> GetResponsesAsync(int contactId, CancellationToken ct)
     {
         await using var conn = await dataSource.OpenConnectionAsync(ct);
-        var rows = await conn.QueryAsync<ContactResponseItem>(new CommandDefinition("""
+        var rows = await conn.QueryAsync<ContactResponse>(new CommandDefinition("""
             SELECT r.id,
                    r.survey_id,
                    s.name AS survey_name,
