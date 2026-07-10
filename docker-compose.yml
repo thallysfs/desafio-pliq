@@ -1,0 +1,23 @@
+services:
+  db:
+    image: postgres:17
+    container_name: pliq-cx-db
+    environment:
+      POSTGRES_USER: pliq
+      POSTGRES_PASSWORD: pliq
+      POSTGRES_DB: pliq_cx
+    ports:
+      - "5432:5432"
+    volumes:
+      # Executado na PRIMEIRA subida (banco vazio): cria o schema e carrega o seed.
+      # A ordem alfabética garante 01-schema.sql antes de 02-seed.sql.
+      - ./db/init:/docker-entrypoint-initdb.d:ro
+      - pliq_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U pliq -d pliq_cx"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  pliq_pgdata:
