@@ -19,5 +19,21 @@ services:
       timeout: 5s
       retries: 10
 
+  api:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: pliq-cx-api
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      # Aponta para o serviço 'db' na rede do compose (não localhost).
+      ConnectionStrings__Postgres: "Host=db;Port=5432;Database=pliq_cx;Username=pliq;Password=pliq"
+      # Origem do front liberada no CORS (dev server do Vite).
+      Cors__FrontendOrigin: "http://localhost:5173"
+    ports:
+      - "5080:8080"
+
 volumes:
   pliq_pgdata:
