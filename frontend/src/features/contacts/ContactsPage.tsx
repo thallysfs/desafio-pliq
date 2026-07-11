@@ -66,8 +66,8 @@ export function ContactsPage() {
                 <ContactsTable contacts={result.items} />
               </div>
               <Pagination
-                page={result.page}
-                pageSize={result.pageSize}
+                page={page}
+                pageSize={PAGE_SIZE}
                 total={result.total}
                 onPageChange={setPage}
               />
