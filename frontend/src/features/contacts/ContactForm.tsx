@@ -1,3 +1,4 @@
+import { Pencil, UserPlus } from 'lucide-react'
 import { useState, type FormEvent } from 'react'
 import { ApiError } from '../../api/http'
 import type { Contact, ContactInput } from '../../api/types'
@@ -57,7 +58,7 @@ export function ContactForm({ contact, isSubmitting, onSubmit, onClose }: Contac
   const displayedError = fieldError ?? submitError
 
   return (
-    <Modal title={isEdit ? 'Editar contato' : 'Novo contato'} onClose={onClose}>
+    <Modal title={isEdit ? 'Editar contato' : 'Novo contato'} onClose={onClose} icon={isEdit ? Pencil : UserPlus}>
       <form onSubmit={handleSubmit} className="space-y-4" noValidate>
         {displayedError ? (
           <p className="rounded-md bg-red-50 px-3 py-2 text-sm text-red-700">{displayedError}</p>
@@ -73,7 +74,7 @@ export function ContactForm({ contact, isSubmitting, onSubmit, onClose }: Contac
             value={name}
             onChange={(event) => setName(event.target.value)}
             autoFocus
-            className="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-slate-500 focus:ring-1 focus:ring-slate-500 focus:outline-none"
+            className="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none"
           />
         </div>
 
@@ -86,7 +87,7 @@ export function ContactForm({ contact, isSubmitting, onSubmit, onClose }: Contac
             type="email"
             value={email}
             onChange={(event) => setEmail(event.target.value)}
-            className="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-slate-500 focus:ring-1 focus:ring-slate-500 focus:outline-none"
+            className="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none"
           />
         </div>
 
@@ -99,7 +100,7 @@ export function ContactForm({ contact, isSubmitting, onSubmit, onClose }: Contac
             type="text"
             value={segment ?? ''}
             onChange={(event) => setSegment(event.target.value)}
-            className="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-slate-500 focus:ring-1 focus:ring-slate-500 focus:outline-none"
+            className="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none"
           />
           <div className="mt-1.5 flex flex-wrap gap-1.5">
             {KNOWN_SEGMENTS.map((option) => (
@@ -107,7 +108,7 @@ export function ContactForm({ contact, isSubmitting, onSubmit, onClose }: Contac
                 key={option}
                 type="button"
                 onClick={() => setSegment(option)}
-                className="rounded-full border border-slate-200 px-2.5 py-0.5 text-xs font-medium text-slate-600 hover:border-slate-300 hover:bg-slate-50"
+                className="rounded-full border border-slate-200 px-2.5 py-0.5 text-xs font-medium text-slate-600 hover:border-primary/40 hover:bg-primary-soft hover:text-primary-strong"
               >
                 {option}
               </button>
@@ -126,7 +127,7 @@ export function ContactForm({ contact, isSubmitting, onSubmit, onClose }: Contac
           <button
             type="submit"
             disabled={isSubmitting}
-            className="rounded-md bg-slate-900 px-3 py-1.5 text-sm font-medium text-white hover:bg-slate-800 disabled:opacity-50"
+            className="rounded-md bg-primary px-3 py-1.5 text-sm font-medium text-white hover:bg-primary-strong disabled:opacity-50"
           >
             {isSubmitting ? 'Salvando…' : isEdit ? 'Salvar alterações' : 'Criar contato'}
           </button>

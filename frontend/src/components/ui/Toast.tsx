@@ -1,3 +1,4 @@
+import { CheckCircle2, XCircle } from 'lucide-react'
 import {
   createContext,
   useCallback,
@@ -68,17 +69,21 @@ export function ToastProvider({ children }: { children: ReactNode }) {
       {children}
       {createPortal(
         <div className="fixed right-4 bottom-4 z-50 flex flex-col gap-2">
-          {toasts.map((toast) => (
-            <div
-              key={toast.id}
-              role="status"
-              className={`rounded-md px-4 py-2.5 text-sm font-medium text-white shadow-lg ${
-                toast.variant === 'success' ? 'bg-emerald-600' : 'bg-red-600'
-              }`}
-            >
-              {toast.text}
-            </div>
-          ))}
+          {toasts.map((toast) => {
+            const Icon = toast.variant === 'success' ? CheckCircle2 : XCircle
+            return (
+              <div
+                key={toast.id}
+                role="status"
+                className={`flex items-center gap-2 rounded-md px-4 py-2.5 text-sm font-medium text-white shadow-lg ${
+                  toast.variant === 'success' ? 'bg-emerald-600' : 'bg-red-600'
+                }`}
+              >
+                <Icon className="h-4 w-4 shrink-0" />
+                {toast.text}
+              </div>
+            )
+          })}
         </div>,
         document.body,
       )}

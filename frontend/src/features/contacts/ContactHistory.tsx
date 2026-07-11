@@ -1,3 +1,5 @@
+import { History, Link2, Mail, MessageCircle } from 'lucide-react'
+import type { ComponentType } from 'react'
 import type { Contact, ContactResponse } from '../../api/types'
 import { EmptyState } from '../../components/ui/EmptyState'
 import { Loading } from '../../components/ui/Loading'
@@ -21,6 +23,12 @@ const CHANNEL_LABEL: Record<string, string> = {
   whatsapp: 'WhatsApp',
   email: 'E-mail',
   link: 'Link',
+}
+
+const CHANNEL_ICON: Record<string, ComponentType<{ className?: string }>> = {
+  whatsapp: MessageCircle,
+  email: Mail,
+  link: Link2,
 }
 
 function formatDate(iso: string): string {
@@ -55,7 +63,7 @@ export function ContactHistory({ contact, onClose }: ContactHistoryProps) {
   const { data, isPending, isError, error, refetch } = useContactResponses(contact.id)
 
   return (
-    <Modal title={`Histórico — ${contact.name}`} onClose={onClose} size="lg">
+    <Modal title={`Histórico — ${contact.name}`} onClose={onClose} size="lg" icon={History}>
       <div className="max-h-[60vh] overflow-y-auto">
         <QueryState
           isPending={isPending}
@@ -74,23 +82,31 @@ export function ContactHistory({ contact, onClose }: ContactHistoryProps) {
         >
           {(responses) => (
             <ul className="divide-y divide-slate-100">
-              {responses.map((response) => (
-                <li key={response.id} className="py-3 first:pt-0 last:pb-0">
-                  <div className="flex items-start justify-between gap-3">
-                    <div>
-                      <p className="text-sm font-medium text-slate-900">{response.surveyName}</p>
-                      <p className="text-xs text-slate-500">
-                        {formatDate(response.respondedAt)} ·{' '}
-                        {CHANNEL_LABEL[response.channel] ?? response.channel}
-                      </p>
+              {responses.map((response) => {
+                const ChannelIcon = CHANNEL_ICON[response.channel]
+                return (
+                  <li key={response.id} className="py-3 first:pt-0 last:pb-0">
+                    <div className="flex items-start justify-between gap-3">
+                      <div>
+                        <p className="text-sm font-medium text-slate-900">
+                          {response.surveyName}
+                        </p>
+                        <p className="mt-0.5 flex items-center gap-1.5 text-xs text-slate-500">
+                          {formatDate(response.respondedAt)}
+                          <span className="flex items-center gap-1">
+                            {ChannelIcon ? <ChannelIcon className="h-3 w-3" /> : null}
+                            {CHANNEL_LABEL[response.channel] ?? response.channel}
+                          </span>
+                        </p>
+                      </div>
+                      <ScoreBadge response={response} />
                     </div>
-                    <ScoreBadge response={response} />
-                  </div>
-                  {response.comment ? (
-                    <p className="mt-1.5 text-sm text-slate-600 italic">“{response.comment}”</p>
-                  ) : null}
-                </li>
-              ))}
+                    {response.comment ? (
+                      <p className="mt-1.5 text-sm text-slate-600 italic">“{response.comment}”</p>
+                    ) : null}
+                  </li>
+                )
+              })}
             </ul>
           )}
         </QueryState>

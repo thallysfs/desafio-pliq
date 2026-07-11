@@ -1,3 +1,4 @@
+import { AlertTriangle } from 'lucide-react'
 import { Modal } from './Modal'
 
 interface ConfirmDialogProps {
@@ -20,7 +21,12 @@ export function ConfirmDialog({
   onCancel,
 }: ConfirmDialogProps) {
   return (
-    <Modal title={title} onClose={onCancel}>
+    <Modal
+      title={title}
+      onClose={onCancel}
+      icon={AlertTriangle}
+      iconClassName="bg-red-100 text-red-600"
+    >
       <div className="space-y-4">
         <p className="text-sm text-slate-600">{message}</p>
         {error ? (

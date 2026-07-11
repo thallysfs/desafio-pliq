@@ -1,3 +1,5 @@
+import { ChevronLeft, ChevronRight } from 'lucide-react'
+
 interface PaginationProps {
   page: number
   pageSize: number
@@ -18,17 +20,19 @@ export function Pagination({ page, pageSize, total, onPageChange }: PaginationPr
           type="button"
           onClick={() => onPageChange(page - 1)}
           disabled={page <= 1}
-          className="rounded-md border border-slate-300 px-3 py-1.5 font-medium text-slate-700 hover:bg-slate-50 disabled:pointer-events-none disabled:opacity-40"
+          className="flex items-center gap-1 rounded-md border border-slate-300 px-3 py-1.5 font-medium text-slate-700 hover:bg-slate-50 disabled:pointer-events-none disabled:opacity-40"
         >
+          <ChevronLeft className="h-3.5 w-3.5" />
           Anterior
         </button>
         <button
           type="button"
           onClick={() => onPageChange(page + 1)}
           disabled={page >= totalPages}
-          className="rounded-md border border-slate-300 px-3 py-1.5 font-medium text-slate-700 hover:bg-slate-50 disabled:pointer-events-none disabled:opacity-40"
+          className="flex items-center gap-1 rounded-md border border-slate-300 px-3 py-1.5 font-medium text-slate-700 hover:bg-slate-50 disabled:pointer-events-none disabled:opacity-40"
         >
           Próxima
+          <ChevronRight className="h-3.5 w-3.5" />
         </button>
       </div>
     </div>
