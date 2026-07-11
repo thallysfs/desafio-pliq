@@ -36,3 +36,6 @@ Thumbs.db
 
 # ---------- Docker ----------
 # volumes de dados do Postgres são gerenciados pelo Docker (não versionar)
+
+#IA
+.agents/

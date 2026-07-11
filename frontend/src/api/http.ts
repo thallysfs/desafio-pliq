@@ -48,8 +48,6 @@ async function extractErrorMessage(response: Response): Promise<string> {
     ) {
       return (data as { error: string }).error
     }
-  } catch {
-    // corpo vazio ou não-JSON
-  }
+  } catch {}
   return `Erro ${response.status}`
 }
