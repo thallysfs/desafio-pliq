@@ -5,9 +5,15 @@ interface ModalProps {
   title: string
   onClose: () => void
   children: ReactNode
+  size?: 'md' | 'lg'
 }
 
-export function Modal({ title, onClose, children }: ModalProps) {
+const SIZE_CLASS: Record<'md' | 'lg', string> = {
+  md: 'max-w-md',
+  lg: 'max-w-lg',
+}
+
+export function Modal({ title, onClose, children, size = 'md' }: ModalProps) {
   useEffect(() => {
     function handleKeyDown(event: KeyboardEvent) {
       if (event.key === 'Escape') onClose()
@@ -34,7 +40,7 @@ export function Modal({ title, onClose, children }: ModalProps) {
         aria-modal="true"
         aria-labelledby="modal-title"
         onClick={(event) => event.stopPropagation()}
-        className="w-full max-w-md rounded-lg bg-white p-6 shadow-xl"
+        className={`w-full ${SIZE_CLASS[size]} rounded-lg bg-white p-6 shadow-xl`}
       >
         <div className="mb-4 flex items-center justify-between">
           <h2 id="modal-title" className="text-lg font-semibold text-slate-900">

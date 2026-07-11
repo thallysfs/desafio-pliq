@@ -9,6 +9,7 @@ import { SearchInput } from '../../components/ui/SearchInput'
 import { useToast } from '../../components/ui/Toast'
 import { useDebouncedValue } from '../../hooks/useDebouncedValue'
 import { ContactForm } from './ContactForm'
+import { ContactHistory } from './ContactHistory'
 import { ContactsTable } from './ContactsTable'
 import { useContacts } from './useContacts'
 import { useCreateContact, useDeleteContact, useUpdateContact } from './useContactMutations'
@@ -23,6 +24,7 @@ export function ContactsPage() {
   const [page, setPage] = useState(1)
   const [formState, setFormState] = useState<FormState>(null)
   const [deleteTarget, setDeleteTarget] = useState<Contact | null>(null)
+  const [historyTarget, setHistoryTarget] = useState<Contact | null>(null)
 
   const { showToast } = useToast()
 
@@ -121,6 +123,7 @@ export function ContactsPage() {
               <div className="overflow-x-auto px-4">
                 <ContactsTable
                   contacts={result.items}
+                  onViewHistory={setHistoryTarget}
                   onEdit={(contact) => setFormState({ mode: 'edit', contact })}
                   onDelete={openDelete}
                 />
@@ -155,6 +158,10 @@ export function ContactsPage() {
           onConfirm={() => void handleConfirmDelete()}
           onCancel={closeDelete}
         />
+      ) : null}
+
+      {historyTarget ? (
+        <ContactHistory contact={historyTarget} onClose={() => setHistoryTarget(null)} />
       ) : null}
     </section>
   )

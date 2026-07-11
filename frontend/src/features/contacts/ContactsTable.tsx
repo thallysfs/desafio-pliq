@@ -2,11 +2,12 @@ import type { Contact } from '../../api/types'
 
 interface ContactsTableProps {
   contacts: Contact[]
+  onViewHistory: (contact: Contact) => void
   onEdit: (contact: Contact) => void
   onDelete: (contact: Contact) => void
 }
 
-export function ContactsTable({ contacts, onEdit, onDelete }: ContactsTableProps) {
+export function ContactsTable({ contacts, onViewHistory, onEdit, onDelete }: ContactsTableProps) {
   return (
     <table className="w-full text-left text-sm">
       <thead>
@@ -26,8 +27,15 @@ export function ContactsTable({ contacts, onEdit, onDelete }: ContactsTableProps
             <td className="py-2.5 text-right">
               <button
                 type="button"
-                onClick={() => onEdit(contact)}
+                onClick={() => onViewHistory(contact)}
                 className="rounded-md px-2 py-1 font-medium text-slate-600 hover:bg-slate-100"
+              >
+                Histórico
+              </button>
+              <button
+                type="button"
+                onClick={() => onEdit(contact)}
+                className="ml-1 rounded-md px-2 py-1 font-medium text-slate-600 hover:bg-slate-100"
               >
                 Editar
               </button>
