@@ -51,6 +51,16 @@ export function ContactsPage() {
     setFormState(null)
   }
 
+  function openDelete(contact: Contact) {
+    deleteContact.reset()
+    setDeleteTarget(contact)
+  }
+
+  function closeDelete() {
+    deleteContact.reset()
+    setDeleteTarget(null)
+  }
+
   async function handleConfirmDelete() {
     if (!deleteTarget) return
     try {
@@ -112,7 +122,7 @@ export function ContactsPage() {
                 <ContactsTable
                   contacts={result.items}
                   onEdit={(contact) => setFormState({ mode: 'edit', contact })}
-                  onDelete={(contact) => setDeleteTarget(contact)}
+                  onDelete={openDelete}
                 />
               </div>
               <Pagination
@@ -143,7 +153,7 @@ export function ContactsPage() {
           isLoading={deleteContact.isPending}
           error={deleteContact.error?.message}
           onConfirm={() => void handleConfirmDelete()}
-          onCancel={() => setDeleteTarget(null)}
+          onCancel={closeDelete}
         />
       ) : null}
     </section>
