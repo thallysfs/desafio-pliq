@@ -1,5 +1,5 @@
 import { http } from './http'
-import type { Contact, ContactsQuery, PagedResult } from './types'
+import type { Contact, ContactInput, ContactsQuery, PagedResult } from './types'
 
 export function getContacts(
   query: ContactsQuery,
@@ -12,4 +12,16 @@ export function getContacts(
 
   const qs = params.toString()
   return http<PagedResult<Contact>>(`/api/contacts${qs ? `?${qs}` : ''}`, { signal })
+}
+
+export function createContact(input: ContactInput): Promise<Contact> {
+  return http<Contact>('/api/contacts', { method: 'POST', body: input })
+}
+
+export function updateContact(id: number, input: ContactInput): Promise<Contact> {
+  return http<Contact>(`/api/contacts/${id}`, { method: 'PUT', body: input })
+}
+
+export function deleteContact(id: number): Promise<void> {
+  return http<void>(`/api/contacts/${id}`, { method: 'DELETE' })
 }

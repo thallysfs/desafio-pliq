@@ -2,9 +2,11 @@ import type { Contact } from '../../api/types'
 
 interface ContactsTableProps {
   contacts: Contact[]
+  onEdit: (contact: Contact) => void
+  onDelete: (contact: Contact) => void
 }
 
-export function ContactsTable({ contacts }: ContactsTableProps) {
+export function ContactsTable({ contacts, onEdit, onDelete }: ContactsTableProps) {
   return (
     <table className="w-full text-left text-sm">
       <thead>
@@ -12,6 +14,7 @@ export function ContactsTable({ contacts }: ContactsTableProps) {
           <th className="py-2 font-medium">Nome</th>
           <th className="py-2 font-medium">E-mail</th>
           <th className="py-2 font-medium">Segmento</th>
+          <th className="py-2 font-medium text-right">Ações</th>
         </tr>
       </thead>
       <tbody>
@@ -20,6 +23,22 @@ export function ContactsTable({ contacts }: ContactsTableProps) {
             <td className="py-2.5 text-slate-900">{contact.name}</td>
             <td className="py-2.5 text-slate-600">{contact.email}</td>
             <td className="py-2.5 text-slate-600">{contact.segment ?? '—'}</td>
+            <td className="py-2.5 text-right">
+              <button
+                type="button"
+                onClick={() => onEdit(contact)}
+                className="rounded-md px-2 py-1 font-medium text-slate-600 hover:bg-slate-100"
+              >
+                Editar
+              </button>
+              <button
+                type="button"
+                onClick={() => onDelete(contact)}
+                className="ml-1 rounded-md px-2 py-1 font-medium text-red-600 hover:bg-red-50"
+              >
+                Excluir
+              </button>
+            </td>
           </tr>
         ))}
       </tbody>
