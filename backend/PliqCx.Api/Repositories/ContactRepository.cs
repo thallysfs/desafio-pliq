@@ -10,9 +10,6 @@ public sealed class ContactRepository(NpgsqlDataSource dataSource) : IContactRep
     public async Task<(IReadOnlyList<Contact> Items, long Total)> ListAsync(
         string? search, int page, int pageSize, CancellationToken ct)
     {
-        // lower(coluna) LIKE lower(@pattern) casa com os índices de expressão
-        // idx_contacts_*_trgm (gin em lower(name)/lower(email)) — ILIKE direto na
-        // coluna não usaria esses índices (expressão diferente da indexada).
         const string filter = """
             WHERE deleted_at IS NULL
               AND (@search IS NULL OR lower(name) LIKE lower(@pattern) OR lower(email) LIKE lower(@pattern))
