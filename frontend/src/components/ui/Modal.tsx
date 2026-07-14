@@ -42,7 +42,7 @@ export function Modal({
 
   return createPortal(
     <div
-      className="fixed inset-0 z-40 flex items-center justify-center bg-slate-900/40 p-4"
+      className="fixed inset-0 z-40 flex items-center justify-center bg-ink/50 p-4 backdrop-blur-sm"
       onClick={onClose}
     >
       <div
@@ -50,18 +50,18 @@ export function Modal({
         aria-modal="true"
         aria-labelledby="modal-title"
         onClick={(event) => event.stopPropagation()}
-        className={`w-full ${SIZE_CLASS[size]} rounded-xl bg-white p-6 shadow-xl`}
+        className={`w-full ${SIZE_CLASS[size]} rounded-2xl bg-surface-1 p-6 shadow-2xl`}
       >
-        <div className="mb-4 flex items-center justify-between">
+        <div className="mb-5 flex items-center justify-between">
           <div className="flex items-center gap-2.5">
             {Icon ? (
               <span
-                className={`flex h-8 w-8 items-center justify-center rounded-lg ${iconClassName}`}
+                className={`flex h-9 w-9 items-center justify-center rounded-xl ${iconClassName}`}
               >
                 <Icon className="h-4.5 w-4.5" strokeWidth={2.25} />
               </span>
             ) : null}
-            <h2 id="modal-title" className="text-lg font-semibold text-slate-900">
+            <h2 id="modal-title" className="font-display text-lg font-bold text-ink">
               {title}
             </h2>
           </div>
@@ -69,7 +69,7 @@ export function Modal({
             type="button"
             onClick={onClose}
             aria-label="Fechar"
-            className="rounded-md p-1 text-slate-400 hover:bg-slate-100 hover:text-slate-600"
+            className="rounded-lg p-1.5 text-muted hover:bg-surface-2 hover:text-ink"
           >
             <X className="h-4.5 w-4.5" />
           </button>

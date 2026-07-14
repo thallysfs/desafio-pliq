@@ -16,19 +16,21 @@ export function StatCard({
   iconClassName = 'bg-primary-soft text-primary-strong',
 }: StatCardProps) {
   return (
-    <div className="rounded-lg border border-slate-200 bg-white p-4">
+    <div className="rounded-2xl border border-line bg-surface-1 p-5 shadow-[0_4px_20px_rgba(21,28,39,0.05)]">
       <div className="flex items-center justify-between">
-        <span className="text-sm font-medium text-slate-500">{label}</span>
+        <span className="text-[11px] font-semibold tracking-[0.06em] text-muted uppercase">
+          {label}
+        </span>
         {Icon ? (
           <span
-            className={`flex h-6.5 w-6.5 shrink-0 items-center justify-center rounded-md ${iconClassName}`}
+            className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg ${iconClassName}`}
           >
-            <Icon className="h-3.5 w-3.5" strokeWidth={2.25} />
+            <Icon className="h-4 w-4" strokeWidth={2.25} />
           </span>
         ) : null}
       </div>
-      <p className="mt-2 text-2xl font-semibold text-slate-900">{value}</p>
-      {description ? <p className="text-sm text-slate-500">{description}</p> : null}
+      <p className="mt-3 font-display text-3xl leading-none font-bold text-ink">{value}</p>
+      {description ? <p className="mt-2 text-sm text-muted">{description}</p> : null}
     </div>
   )
 }

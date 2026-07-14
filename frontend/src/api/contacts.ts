@@ -14,6 +14,10 @@ export function getContacts(
   return http<PagedResult<Contact>>(`/api/contacts${qs ? `?${qs}` : ''}`, { signal })
 }
 
+export function getContact(id: number, signal?: AbortSignal): Promise<Contact> {
+  return http<Contact>(`/api/contacts/${id}`, { signal })
+}
+
 export function createContact(input: ContactInput): Promise<Contact> {
   return http<Contact>('/api/contacts', { method: 'POST', body: input })
 }

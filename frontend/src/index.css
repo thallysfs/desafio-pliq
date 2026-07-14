@@ -1,12 +1,33 @@
 @import 'tailwindcss';
 
 @theme {
-  --color-primary: oklch(0.42 0.09 170);
-  --color-primary-strong: oklch(0.34 0.09 170);
-  --color-primary-soft: oklch(0.93 0.03 170);
-  --color-accent: oklch(0.62 0.16 35);
-  --color-accent-soft: oklch(0.94 0.04 35);
-  --color-surface-2: oklch(0.94 0.012 170);
+  /* Tipografia — Montserrat nas manchetes, Inter no corpo (Design System Vita) */
+  --font-sans: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --font-display: 'Montserrat', var(--font-sans);
+
+  /* Superfícies — do mais claro (fundo) ao tonal azulado dos containers */
+  --color-surface: #f9f9ff;
+  --color-surface-1: #ffffff;
+  --color-surface-2: #f0f3ff;
+  --color-surface-3: #e7eefe;
+  --color-surface-4: #dce2f3;
+
+  /* Estrutura escura — sidebar e texto */
+  --color-sidebar: #2a313d;
+  --color-ink: #151c27;
+  --color-muted: #5b6472;
+  --color-line: #e2e6f3;
+
+  /* Marca — laranja Vita: primário sóbrio + variante viva para CTAs */
+  --color-primary: #a63b00;
+  --color-primary-strong: #7f2b00;
+  --color-primary-bright: #ff5f00;
+  --color-primary-soft: #ffdbce;
+  --color-primary-dim: #ffb599;
+
+  /* Status (regra de negócio NPS/CSAT — não são decoração de marca) */
+  --color-danger: #ba1a1a;
+  --color-danger-soft: #ffdad6;
 }
 
 :root {
@@ -14,5 +35,20 @@
 }
 
 body {
-  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  font-family: var(--font-sans);
+  background-color: var(--color-surface);
+  color: var(--color-ink);
+}
+
+/* Barra de rolagem discreta, alinhada às superfícies tonais */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: var(--color-surface-4);
+  border-radius: 9999px;
 }

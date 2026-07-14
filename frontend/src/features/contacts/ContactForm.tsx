@@ -3,8 +3,8 @@ import { useState, type FormEvent } from 'react'
 import { ApiError } from '../../api/http'
 import type { Contact, ContactInput } from '../../api/types'
 import { Modal } from '../../components/ui/Modal'
-
-const KNOWN_SEGMENTS = ['Plano Black', 'Plano Fit', 'Corporativo']
+import { SegmentField } from './SegmentField'
+import { toContactInput, validateContact } from './contactValidation'
 
 interface ContactFormProps {
   contact?: Contact
@@ -13,9 +13,8 @@ interface ContactFormProps {
   onClose: () => void
 }
 
-function isValidEmail(email: string): boolean {
-  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
-}
+const inputClass =
+  'mt-1 w-full rounded-xl border border-line bg-surface-1 px-3.5 py-2.5 text-sm text-ink focus:border-primary-bright focus:ring-2 focus:ring-primary-bright/40 focus:outline-none'
 
 export function ContactForm({ contact, isSubmitting, onSubmit, onClose }: ContactFormProps) {
   const [name, setName] = useState(contact?.name ?? '')
@@ -30,42 +29,35 @@ export function ContactForm({ contact, isSubmitting, onSubmit, onClose }: Contac
     event.preventDefault()
     setSubmitError(null)
 
-    if (!name.trim()) {
-      setFieldError('Nome é obrigatório.')
-      return
-    }
-    if (!email.trim()) {
-      setFieldError('E-mail é obrigatório.')
-      return
-    }
-    if (!isValidEmail(email.trim())) {
-      setFieldError('E-mail em formato inválido.')
+    const validationError = validateContact({ name, email })
+    if (validationError) {
+      setFieldError(validationError)
       return
     }
     setFieldError(null)
 
     try {
-      await onSubmit({
-        name: name.trim(),
-        email: email.trim(),
-        segment: segment.trim() || null,
-      })
+      await onSubmit(toContactInput(name, email, segment ?? ''))
     } catch (err) {
-      setSubmitError(err instanceof ApiError ? err.message : 'Não foi possível salvar o contato.')
+      setSubmitError(err instanceof ApiError ? err.message : 'Não foi possível salvar o aluno.')
     }
   }
 
   const displayedError = fieldError ?? submitError
 
   return (
-    <Modal title={isEdit ? 'Editar contato' : 'Novo contato'} onClose={onClose} icon={isEdit ? Pencil : UserPlus}>
+    <Modal
+      title={isEdit ? 'Editar aluno' : 'Novo aluno'}
+      onClose={onClose}
+      icon={isEdit ? Pencil : UserPlus}
+    >
       <form onSubmit={handleSubmit} className="space-y-4" noValidate>
         {displayedError ? (
-          <p className="rounded-md bg-red-50 px-3 py-2 text-sm text-red-700">{displayedError}</p>
+          <p className="rounded-lg bg-danger-soft px-3 py-2 text-sm text-danger">{displayedError}</p>
         ) : null}
 
         <div>
-          <label htmlFor="contact-name" className="block text-sm font-medium text-slate-700">
+          <label htmlFor="contact-name" className="block text-sm font-medium text-ink">
             Nome
           </label>
           <input
@@ -74,12 +66,12 @@ export function ContactForm({ contact, isSubmitting, onSubmit, onClose }: Contac
             value={name}
             onChange={(event) => setName(event.target.value)}
             autoFocus
-            className="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none"
+            className={inputClass}
           />
         </div>
 
         <div>
-          <label htmlFor="contact-email" className="block text-sm font-medium text-slate-700">
+          <label htmlFor="contact-email" className="block text-sm font-medium text-ink">
             E-mail
           </label>
           <input
@@ -87,49 +79,26 @@ export function ContactForm({ contact, isSubmitting, onSubmit, onClose }: Contac
             type="email"
             value={email}
             onChange={(event) => setEmail(event.target.value)}
-            className="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none"
+            className={inputClass}
           />
         </div>
 
-        <div>
-          <label htmlFor="contact-segment" className="block text-sm font-medium text-slate-700">
-            Segmento <span className="text-slate-400">(opcional)</span>
-          </label>
-          <input
-            id="contact-segment"
-            type="text"
-            value={segment ?? ''}
-            onChange={(event) => setSegment(event.target.value)}
-            className="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none"
-          />
-          <div className="mt-1.5 flex flex-wrap gap-1.5">
-            {KNOWN_SEGMENTS.map((option) => (
-              <button
-                key={option}
-                type="button"
-                onClick={() => setSegment(option)}
-                className="rounded-full border border-slate-200 px-2.5 py-0.5 text-xs font-medium text-slate-600 hover:border-primary/40 hover:bg-primary-soft hover:text-primary-strong"
-              >
-                {option}
-              </button>
-            ))}
-          </div>
-        </div>
+        <SegmentField value={segment ?? ''} onChange={setSegment} />
 
         <div className="flex justify-end gap-2 pt-2">
           <button
             type="button"
             onClick={onClose}
-            className="rounded-md border border-slate-300 px-3 py-1.5 text-sm font-medium text-slate-700 hover:bg-slate-50"
+            className="rounded-lg border border-line px-4 py-2 text-sm font-semibold text-ink hover:bg-surface-2"
           >
             Cancelar
           </button>
           <button
             type="submit"
             disabled={isSubmitting}
-            className="rounded-md bg-primary px-3 py-1.5 text-sm font-medium text-white hover:bg-primary-strong disabled:opacity-50"
+            className="rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-white hover:bg-primary-strong disabled:opacity-50"
           >
-            {isSubmitting ? 'Salvando…' : isEdit ? 'Salvar alterações' : 'Criar contato'}
+            {isSubmitting ? 'Salvando…' : isEdit ? 'Salvar alterações' : 'Criar aluno'}
           </button>
         </div>
       </form>

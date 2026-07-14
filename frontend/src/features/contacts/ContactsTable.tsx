@@ -1,80 +1,80 @@
-import { History, Pencil, Trash2 } from 'lucide-react'
-import type { ComponentType } from 'react'
+import { ChevronRight, Trash2 } from 'lucide-react'
 import type { Contact } from '../../api/types'
+import { avatarTint, initials } from '../../utils/avatar'
 
 interface ContactsTableProps {
   contacts: Contact[]
-  onViewHistory: (contact: Contact) => void
-  onEdit: (contact: Contact) => void
+  onOpen: (contact: Contact) => void
   onDelete: (contact: Contact) => void
 }
 
-interface RowActionButtonProps {
-  label: string
-  icon: ComponentType<{ className?: string }>
-  onClick: () => void
-  danger?: boolean
-}
-
-function RowActionButton({ label, icon: Icon, onClick, danger }: RowActionButtonProps) {
+export function ContactsTable({ contacts, onOpen, onDelete }: ContactsTableProps) {
   return (
-    <button
-      type="button"
-      onClick={onClick}
-      title={label}
-      aria-label={label}
-      className={`flex h-8 w-8 items-center justify-center rounded-md text-slate-500 ${
-        danger ? 'hover:bg-red-50 hover:text-red-600' : 'hover:bg-surface-2 hover:text-slate-900'
-      }`}
-    >
-      <Icon className="h-4 w-4" />
-    </button>
-  )
-}
-
-export function ContactsTable({ contacts, onViewHistory, onEdit, onDelete }: ContactsTableProps) {
-  return (
-    <table className="w-full text-left text-sm">
+    <table className="w-full border-collapse text-left text-sm">
       <thead>
-        <tr className="border-b border-slate-200 text-slate-500">
-          <th className="py-2 font-medium">Nome</th>
-          <th className="py-2 font-medium">E-mail</th>
-          <th className="py-2 font-medium">Segmento</th>
-          <th className="py-2 font-medium text-right">Ações</th>
+        <tr className="border-b border-line">
+          <th className="px-5 py-3.5 text-[11px] font-semibold tracking-[0.06em] text-muted uppercase">
+            Aluno
+          </th>
+          <th className="px-5 py-3.5 text-[11px] font-semibold tracking-[0.06em] text-muted uppercase">
+            Segmento
+          </th>
+          <th className="px-5 py-3.5 text-right text-[11px] font-semibold tracking-[0.06em] text-muted uppercase">
+            Ações
+          </th>
         </tr>
       </thead>
-      <tbody>
+      <tbody className="divide-y divide-line">
         {contacts.map((contact) => (
-          <tr key={contact.id} className="border-b border-slate-100 last:border-0">
-            <td className="py-2.5 text-slate-900">{contact.name}</td>
-            <td className="py-2.5 text-slate-600">{contact.email}</td>
-            <td className="py-2.5 text-slate-600">
+          <tr
+            key={contact.id}
+            onClick={() => onOpen(contact)}
+            className="group cursor-pointer transition-colors hover:bg-surface-2"
+          >
+            <td className="px-5 py-3.5">
+              <div className="flex items-center gap-3">
+                <span
+                  className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-xs font-bold ${avatarTint(
+                    contact.id,
+                  )}`}
+                >
+                  {initials(contact.name)}
+                </span>
+                <div className="min-w-0">
+                  <div className="truncate font-semibold text-ink">{contact.name}</div>
+                  <div className="truncate text-xs text-muted">{contact.email}</div>
+                </div>
+              </div>
+            </td>
+            <td className="px-5 py-3.5">
               {contact.segment ? (
                 <span className="rounded-full bg-primary-soft px-2.5 py-0.5 text-xs font-semibold text-primary-strong">
                   {contact.segment}
                 </span>
               ) : (
-                '—'
+                <span className="text-muted">—</span>
               )}
             </td>
-            <td className="py-2.5">
-              <div className="flex justify-end gap-0.5">
-                <RowActionButton
-                  label="Ver histórico de respostas"
-                  icon={History}
-                  onClick={() => onViewHistory(contact)}
-                />
-                <RowActionButton
-                  label="Editar contato"
-                  icon={Pencil}
-                  onClick={() => onEdit(contact)}
-                />
-                <RowActionButton
-                  label="Excluir contato"
-                  icon={Trash2}
-                  onClick={() => onDelete(contact)}
-                  danger
-                />
+            <td className="px-5 py-3.5">
+              <div className="flex items-center justify-end gap-1">
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    onDelete(contact)
+                  }}
+                  title="Excluir aluno"
+                  aria-label={`Excluir ${contact.name}`}
+                  className="flex h-8 w-8 items-center justify-center rounded-lg text-muted hover:bg-danger-soft hover:text-danger"
+                >
+                  <Trash2 className="h-4 w-4" />
+                </button>
+                <span
+                  aria-hidden="true"
+                  className="flex h-8 w-8 items-center justify-center rounded-lg text-muted transition-colors group-hover:text-primary"
+                >
+                  <ChevronRight className="h-4.5 w-4.5" />
+                </span>
               </div>
             </td>
           </tr>

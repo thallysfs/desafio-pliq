@@ -10,7 +10,7 @@ export function SearchInput({ value, onChange, placeholder = 'Buscar…' }: Sear
   return (
     <div className="relative">
       <Search
-        className="pointer-events-none absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-slate-400"
+        className="pointer-events-none absolute top-1/2 left-3.5 h-4 w-4 -translate-y-1/2 text-muted"
         aria-hidden="true"
       />
       <input
@@ -18,7 +18,7 @@ export function SearchInput({ value, onChange, placeholder = 'Buscar…' }: Sear
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
-        className="w-full rounded-md border border-slate-300 py-2 pr-3 pl-9 text-sm text-slate-900 placeholder:text-slate-400 focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none"
+        className="w-full rounded-xl border border-line bg-surface-1 py-2.5 pr-3 pl-10 text-sm text-ink placeholder:text-muted focus:border-primary-bright focus:ring-2 focus:ring-primary-bright/40 focus:outline-none"
       />
     </div>
   )
