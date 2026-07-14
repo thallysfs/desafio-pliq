@@ -46,6 +46,13 @@ npm run dev          # http://localhost:5173  → já aponta para a API em :5080
 
 Abra **http://localhost:5173**.
 
+> ⚠️ **O front precisa rodar na porta 5173.** A API só libera CORS para
+> `http://localhost:5173` (`Cors__FrontendOrigin`). O dev server usa `strictPort`, então
+> se a 5173 estiver ocupada ele **falha em vez de cair na 5174** (evita o cenário em que o
+> navegador abre em outra porta e todas as chamadas são bloqueadas por CORS — a tela
+> carrega, mas sem dados). Se isso acontecer, libere a 5173 (feche o processo Vite antigo)
+> e suba de novo. Ver [Solução de problemas](#solução-de-problemas).
+
 Para derrubar tudo (o volume `pliq_pgdata` preserva os dados entre subidas):
 
 ```bash
@@ -98,6 +105,7 @@ Endpoints obrigatórios (contrato completo em
 | Método | Rota | Descrição |
 |---|---|---|
 | `GET` | `/api/contacts` | Lista com **busca** (nome/e-mail) e **paginação**, ambas no banco |
+| `GET` | `/api/contacts/{id}` | Carrega um contato (usado pela tela de gestão do aluno) → `404` se excluído |
 | `POST` | `/api/contacts` | Cria contato → `201` + `Location` |
 | `PUT` | `/api/contacts/{id}` | Atualiza |
 | `DELETE` | `/api/contacts/{id}` | **Soft delete** → `204` |
@@ -153,6 +161,17 @@ a tela). CRUD reflete na lista sem reload. Loading / erro / vazio sempre explíc
 sem `any`. A classificação de cor de cada resposta NPS (verde/âmbar/vermelho) replica a
 **regra de negócio** exata; CSAT recebe badge neutro (a regra só define classes para NPS).
 
+**Identidade visual Vita Bem-Estar.** Layout de dashboard com **sidebar charcoal** fixa e
+acento **laranja** (paleta e tipografia — Montserrat nos títulos, Inter no corpo — vindas
+do design system do produto), tokens definidos em `index.css` via `@theme` do Tailwind v4.
+Três telas: **Visão Geral** (herói de NPS com barra de distribuição + indicadores),
+**Gestão de Alunos** (tabela com avatares, busca e paginação) e a **Gestão do Aluno**
+(`/contatos/:id`) — que traz **os dados do aluno para edição inline no topo** (nome, e-mail
+e segmento) e, **logo abaixo, a timeline das pesquisas que ele respondeu**, cada uma colorida
+pela classe NPS. Só entram dados reais do banco: métricas inventadas dos mockups (ranking de
+unidades, alertas de IA, CPF/foto) foram descartadas de propósito — a tela nunca mistura fato
+e ficção.
+
 **Testes de integração como bônus.** Testcontainers sobe um Postgres real e roda o mesmo
 schema/seed — as consultas de analytics são verificadas contra os valores de conferência,
 não contra mocks. É o bônus mais valorizado e o que dá confiança de que os números batem.
@@ -190,11 +209,29 @@ profundidade no núcleo a espalhar esforço.
 ├── backend/
 │   ├── PliqCx.Api/     API .NET 10 (Controllers · Services · Repositories · Dtos · Entities · Common)
 │   ├── PliqCx.Api.Tests/  Integração via Testcontainers (xUnit)
-│   └── Dockerfile      Multi-stage, roda como usuário não-root na 8080
+│   └── Dockerfile      Multi-stage (sdk → aspnet 10), publish Release, porta 8080
 ├── frontend/           React 19 + Vite + Tailwind v4 + TanStack Query
+│   └── src/            api/ (camada tipada) · components/ · features/{analytics,contacts}
 ├── docker-compose.yml  Serviços db (5432) + api (5080)
 └── README.md
 ```
+
+---
+
+## Solução de problemas
+
+**As telas carregam mas os dados não aparecem (lista/resumo vazios).** É CORS: o front
+está sendo servido numa origem diferente de `http://localhost:5173`. A causa clássica é um
+processo Vite antigo ocupando a 5173, fazendo um novo `npm run dev` cair na 5174 — origem
+que a API não libera. O `strictPort` no `vite.config.ts` já previne isso (o dev server passa
+a falhar em vez de trocar de porta); se ainda ocorrer, feche o Vite órfão e suba de novo na
+5173. Para servir o front em outra porta, ajuste `Cors__FrontendOrigin` no `docker-compose.yml`
+(ou `appsettings.json` no modo local).
+
+**Log da API: `Cannot load library libgssapi_krb5.so.2`.** É apenas um aviso do Npgsql, que
+sonda GSSAPI/Kerberos ao abrir conexão; a autenticação por senha funciona normalmente e a API
+responde `200`. O `Dockerfile` instala `libgssapi-krb5-2` na imagem de runtime só para remover
+esse ruído do log — não afeta o funcionamento.
 
 ---
 
